@@ -1,11 +1,17 @@
-from math import sqrt
+from math import sqrt, acos, pi
+from decimal import Decimal, getcontext
+
+getcontext().prec = 30
 
 class Vector(object):
+
+    CANNOT_NORMALIZE_ZERO_VECTOR_MSG = 'Cannot normalize the zero vector'
+
     def __init__(self, coordinates):
         try:
             if not coordinates:
                 raise ValueError
-            self.coordinates = tuple(coordinates)
+            self.coordinates = tuple([Decimal(x) for x in coordinates])
             self.dimension = len(coordinates)
 
         except ValueError:
@@ -34,7 +40,7 @@ class Vector(object):
 
     # Scale a vector
     def times_scalar(self, c):
-        new_coordinates = [c*x for x in self.coordinates]
+        new_coordinates = [Decimal(c)*x for x in self.coordinates]
         return Vector(new_coordinates)
 
     # Get the magnitude of two vectors
@@ -46,10 +52,34 @@ class Vector(object):
     def normalized(self):
         try:
             magnitude = self.magnitude()
-            return self.times_scalar(1./magnitude)
+            return self.times_scalar(Decimal('1.0')/magnitude)
         
         except ZeroDivisionError:
             raise Exception('Cannot normalize the zero vector')
+    
+    # Compute the dot product
+    def dot(self, v):
+        return sum([x*y for x,y in zip(self.coordinates, v.coordinates)])
+
+    # Compute angle with
+    def angle_with(self, v, in_degrees=False):
+        try:
+            u1 = self.normalized()
+            u2 = v.normalized()
+            angle_in_radians = acos(u1.dot(u2))
+
+            if in_degrees:
+                degrees_per_radian = 180. / pi 
+                return angle_in_radians * degrees_per_radian
+            else:
+                return angle_in_radians
+
+        except Exception as e:
+            if str(e) == self.CANNOT_NORMALIZE_ZERO_VECTOR_MSG:
+                raise Exception('Cannot compute an angle with the zero vector')
+            else:
+                raise e
+    
 
 my_vector = Vector([1,2,3])
 print(my_vector)
@@ -80,10 +110,23 @@ print(v.magnitude())
 v = Vector([8.813, -1.331, -6.247])
 print(v.magnitude())
 
+# Normalization calculation
 v = Vector([5.581, -2.136])
 print(v.normalized())
 
 v = Vector([1.996, 3.108, -4.554])
 print(v.normalized())
 
+# Dot Product calculation
+v = Vector(['7.887', '4.138'])
+w = Vector(['-8.802', '6.776'])
+print(v.dot(w))
 
+# Angle_with calculation
+v = Vector(['3.183', '-7.627'])
+w = Vector(['-2.668', '5.319'])
+print(v.angle_with(w))
+
+v = Vector(['7.35', '0.221', '5.188'])
+w = Vector(['2.751', '8.259', '3.985'])
+print(v.angle_with(w, in_degrees=True))
