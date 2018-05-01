@@ -1,5 +1,5 @@
 from math import sqrt, acos, pi
-from decimal import Decimal, getcontext
+from decimal import getcontext
 
 getcontext().prec = 30
 
@@ -11,7 +11,7 @@ class Vector(object):
         try:
             if not coordinates:
                 raise ValueError
-            self.coordinates = tuple([Decimal(x) for x in coordinates])
+            self.coordinates = tuple([x for x in coordinates])
             self.dimension = len(coordinates)
 
         except ValueError:
@@ -40,7 +40,7 @@ class Vector(object):
 
     # Scale a vector
     def times_scalar(self, c):
-        new_coordinates = [Decimal(c)*x for x in self.coordinates]
+        new_coordinates = [c*x for x in self.coordinates]
         return Vector(new_coordinates)
 
     # Get the magnitude of two vectors
@@ -52,7 +52,7 @@ class Vector(object):
     def normalized(self):
         try:
             magnitude = self.magnitude()
-            return self.times_scalar(Decimal('1.0')/magnitude)
+            return self.times_scalar(1/magnitude)
         
         except ZeroDivisionError:
             raise Exception('Cannot normalize the zero vector')
@@ -118,15 +118,15 @@ v = Vector([1.996, 3.108, -4.554])
 print(v.normalized())
 
 # Dot Product calculation
-v = Vector(['7.887', '4.138'])
-w = Vector(['-8.802', '6.776'])
+v = Vector([7.887, 4.138])
+w = Vector([-8.802, 6.776])
 print(v.dot(w))
 
 # Angle_with calculation
-v = Vector(['3.183', '-7.627'])
-w = Vector(['-2.668', '5.319'])
+v = Vector([3.183, -7.627])
+w = Vector([-2.668, 5.319])
 print(v.angle_with(w))
 
-v = Vector(['7.35', '0.221', '5.188'])
-w = Vector(['2.751', '8.259', '3.985'])
+v = Vector([7.35, 0.221, 5.188])
+w = Vector([2.751, 8.259, 3.985])
 print(v.angle_with(w, in_degrees=True))
