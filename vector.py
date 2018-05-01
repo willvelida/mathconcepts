@@ -80,6 +80,18 @@ class Vector(object):
             else:
                 raise e
     
+    # Compute whether or not our vectors are orthogonal
+    def is_orthogonal_to(self, v, tolerance=1e-10):
+        return abs(self.dot(v)) < tolerance
+
+    # Computer whether or not our vectors are parallel
+    def is_parallel_to(self, v):
+        return (self.is_zero() or v.is_zero() or self.angle_with(v) == 0 or self.angle_with(v) == pi)
+
+    # Is our vector a zero vector
+    def is_zero(self, tolerance=1e-10):
+        return self.magnitude() < tolerance
+    
 
 my_vector = Vector([1,2,3])
 print(my_vector)
@@ -130,3 +142,9 @@ print(v.angle_with(w))
 v = Vector([7.35, 0.221, 5.188])
 w = Vector([2.751, 8.259, 3.985])
 print(v.angle_with(w, in_degrees=True))
+
+# Parallel and Orthogonal calculations
+v = Vector([-7.579, -7.88])
+w = Vector([22.737,23.64])
+print('is parallel: ', v.is_parallel_to(w))
+print('is orthogonal: ' + v.is_orthogonal_to(w))
