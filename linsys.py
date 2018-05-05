@@ -25,6 +25,30 @@ class LinearSystem(object):
         except AssertionError:
             raise Exception(self.ALL_PLANES_MUST_BE_IN_SAME_DIM_MSG)
 
+    def compute_rref(self):
+        tf = self.compute_triangular_form()
+
+        num_equations = len(tf)
+        pivot_indices = tf.indices_of_first_nonzero_terms_in_each_row()
+
+        for i in range(num_equations)[::-1]:
+            j = pivot_indices[i]
+            if j < 0:
+                continue
+            tf.scale_row_to_make_coefficient_equal_one(i,j)
+            tf.clear_coefficients_above(i,j)
+        return tf
+    
+    def scale_row_to_make_coefficient_equal_one(self,row,col):
+        n = self[row].normal_vector
+        beta = Decimal('1.0') / n[col]
+        self.multiply_coefficient_and_row(beta, row)
+
+    def clear_coefficients_above(self, row, col):
+        for k in range(row)[::-1]:
+            n = self[k].normal_vector
+            alpha = -(n[col])
+            self.add_multiple_times_row_to_row(alpha, row, k)
 
     def compute_triangular_form(self):
         system = deepcopy(self)
