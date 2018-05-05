@@ -26,6 +26,48 @@ class LinearSystem(object):
             raise Exception(self.ALL_PLANES_MUST_BE_IN_SAME_DIM_MSG)
 
 
+    def compute_triangular_form(self):
+        system = deepcopy(self)
+
+        num_equations = len(system)
+        num_variables = system.dimension
+
+        j = 0
+        for i in range(num_equations):
+            while j < num_variables:
+                c = MyDecimal(system[i].normal_vector[j])
+                if c.is_near_zero():
+                    swap_succeeded = system.swap_with_row_below_for_nonzero_coefficient_if_able(i,j)
+                    if not swap_succeeded:
+                        j += 1
+                        continue
+                
+                system.clear_coefficients_below(i, j):
+                j += 1
+                break
+        
+        return system
+    
+    def swap_with_row_below_for_nonzero_coefficient_if_able(self, row, col):
+        num_equations = len(self)
+
+        for k in range(row + 1, num_equations):
+            coefficient = MyDecimal(self[k].normal_vector[col])
+            if not coefficient.is_near_zero():
+                self.swap_rows(row, k)
+                return True
+        return False
+    
+    def clear_coefficients_below(self, row, col):
+        num_equations = len(self)
+        beta = MyDecimal(self[row].normal_vector[col])
+
+        for k in range(row + 1, num_equations):
+            n = self[k].normal_vector
+            gamma = n[col]
+            alpha = -gamma/beta
+            self.add_multiple_times_row_to_row(alpha, row, k)
+
     def swap_rows(self, row1, row2):
         self[row1], self[row2] = self[row2], self[row1]
 
